@@ -26,14 +26,25 @@ public class Player : MonoBehaviour
     public int slot = 0;
     public Image slotSelect;
     public Image sloticon1;
+    public int health = 20;
+
+    
+    public Image NoHeart;
+
+    
     private void Start()
     {
+        
+
         _rig = GetComponent<Rigidbody>();
         lastcube = Instantiate(cube, new Vector3(0,0,0), new Quaternion(0, 0, 0, 0));
         lastcube.SetActive(false);
         
 
     }
+
+    
+
     private void Update()
     {
         //Cleanerway to get input

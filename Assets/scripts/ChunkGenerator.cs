@@ -1,4 +1,4 @@
-using System;
+
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -38,6 +38,63 @@ public class ChunkGenerator : MonoBehaviour
     public Vector2 pos;
 
     private GameObject EmptyObj;
+
+    public int[,,] tree = {
+        { 
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 6, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 6, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 6, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0}
+        },
+        {
+            {9, 9, 9, 9, 9},
+            {9, 9, 9, 9, 9},
+            {9, 9, 6, 9, 9},
+            {9, 9, 9, 9, 9},
+            {9, 9, 9, 9, 9}
+        },
+        {
+            {9, 9, 9, 9, 9},
+            {9, 9, 9, 9, 9},
+            {9, 9, 6, 9, 9},
+            {9, 9, 9, 9, 9},
+            {9, 9, 9, 9, 9}
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 9, 9, 9, 0},
+            {0, 9, 6, 9, 0},
+            {0, 9, 9, 9, 0},
+            {0, 0, 0, 0, 0}
+        },
+        {
+            {0, 0, 0, 0, 0},
+            {0, 0, 9, 0, 0},
+            {0, 9, 9, 9, 0},
+            {0, 0, 9, 0, 0},
+            {0, 0, 0, 0, 0}
+        },
+
+
+    };
+
+    public float xoffset = 0f;
+    public float yoffset = 0f;
 
     void Start()
     {
@@ -116,9 +173,9 @@ public class ChunkGenerator : MonoBehaviour
 
         transform.position = new Vector3(pos.x * width, 0, pos.y * depth);
     }
-    public void generateworld(GameObject tree)
+    public void generateworld()
     {
-
+        
 
         for (int x = 0; x < width; x++)
         {
@@ -133,6 +190,8 @@ public class ChunkGenerator : MonoBehaviour
 
         }
 
+        List<Vector3Int> treepos = new List<Vector3Int>();
+
         
 
         for (int x = 0; x < width; x++)
@@ -142,42 +201,44 @@ public class ChunkGenerator : MonoBehaviour
                 for (int z = 0; z < depth; z++)
                 {
                     
-                    float heightblock = 40 + 20 * Perlin.Fbm((x + pos.x * width) * Mathf.PI / noisescale, (z + pos.y * depth) * Mathf.PI / noisescale,5);
+                    float heightblock = 40 + 20 * Perlin.Fbm((x + pos.x * width + xoffset) * Mathf.PI / noisescale, (z + pos.y * depth + yoffset) * Mathf.PI / noisescale,5);
 
-                    float treespawn = Perlin.Noise((x + pos.x * width) * Mathf.PI, (z + pos.y * depth) * Mathf.PI);
 
                     float min = heightblock - 4;
                     float max = heightblock;
 
                     float smooth = Mathf.SmoothStep(0, 1, (y - min) / (max - min));
 
-                    float value = Perlin.Noise((x + pos.x * width) * Mathf.PI / 20, y * Mathf.PI / 20, (z + pos.y * depth) * Mathf.PI / 20);
+                    float value = Perlin.Noise((x + pos.x * width + xoffset) * Mathf.PI / 20, y * Mathf.PI / 20, (z + pos.y * depth + yoffset) * Mathf.PI / 20);
                     value /= smooth * 2 + 1;
 
                     
                     int blockindex;
                     
-                    if (value > 0.2 || value < -0.2 || y > heightblock)
+                    if (value > 0.2 || value < -0.2)
                     {
-                        blockindex = 0;
+                        blockindex = (char)Blocks.BlockType.Air;
+                    }
+                    else if (y > heightblock)
+                    {
+                        
+                        
+                        blockindex = (char)Blocks.BlockType.Air;
+
                     }
                     else if(y > heightblock - 1)
                     {
-                        blockindex = 2;
+                        blockindex = (char)Blocks.BlockType.Grass;
 
-                        if (treespawn > 0.7)
-                        {
-                            //Instantiate(tree, new Vector3(x + pos.x * width + 0.5f, Mathf.Ceil(heightblock) + 0.5f, z + pos.y * depth + 0.5f), Quaternion.identity);
-                            
-                        }
+                        
                     }
                     else if(y < heightblock - 6)
                     {
-                        blockindex = 1;
+                        blockindex = (char)Blocks.BlockType.Stone;
                     }
                     else
                     {
-                        blockindex = 3;
+                        blockindex = (char)Blocks.BlockType.Dirt;
                     }
 
                    
@@ -186,8 +247,50 @@ public class ChunkGenerator : MonoBehaviour
                 }
             }
         }
-        
+
+        for (int x = -2; x < width + 2; x++)
+        {
+            for (int z = -2; z < depth + 2; z++)
+            {
+                float treespawn = Perlin.Noise((x + pos.x * width) * Mathf.PI, (z + pos.y * depth) * Mathf.PI);
+                float heightblock = 40 + 20 * Perlin.Fbm((x + pos.x * width + xoffset) * Mathf.PI / noisescale, (z + pos.y * depth + yoffset) * Mathf.PI / noisescale, 5);
+
+                if (treespawn > 0.7)
+                {
+                    treepos.Add(new Vector3Int(x, Mathf.CeilToInt(heightblock), z));
+
+                }
+            }
+        }
+
+
+        foreach (Vector3Int pos in treepos)
+        {
+
+            for (int x = 0; x < tree.GetLength(1); x++)
+            {
+                for (int y = 0; y < tree.GetLength(0); y++)
+                {
+                    for (int z = 0; z < tree.GetLength(2); z++)
+                    {
+                        if (pos.x - 2 + x < 0 || pos.x - 2 + x > width - 1 || pos.y + y < 0 || pos.y + y > height - 1 || pos.z - 2 + z < 0 || pos.z - 2 + z > depth - 1)
+                        {
+                            continue;
+                        }
+                        char blockindex = (char)tree[y, x, z];
+                        char otherblock = blocklist[getindex(pos.x - 2 + x, pos.y + y, pos.z - 2 + z)];
+                        if ((blockindex == (char)Blocks.BlockType.Leaves && otherblock == (char)Blocks.BlockType.Air) || (blockindex == (char)Blocks.BlockType.OakLogs && (otherblock == (char)Blocks.BlockType.Air || otherblock == (char)Blocks.BlockType.Leaves)))
+                        {
+                            blocklist[getindex(pos.x - 2 + x, pos.y + y, pos.z - 2 + z)] = blockindex;
+                        }
+                    }
+                }
+            }
+        }
     }
+    
+
+    
     int getindex(int x, int y, int z)
     {
         return x * height * depth + y * depth + z;

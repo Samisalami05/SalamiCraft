@@ -11,15 +11,14 @@ public class camera : MonoBehaviour
    
 
     float xRotation;
-    public float yRotation;
+    float yRotation;
 
     public Rigidbody rb;
 
     public Transform player;
     void Start()
     {
-        //Cursor.lockState = CursorLockMode.Locked;
-        //Cursor.visible = false;
+        
     }
 
     // Update is called once per frame

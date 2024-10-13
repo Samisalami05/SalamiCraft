@@ -14,10 +14,13 @@ public class worldgen : MonoBehaviour
 
     public GameObject tree;
 
+    public float xoffset = 0f;
+    public float yoffset = 0f;
     public static worldgen Instance { get; private set; }
     void Start()
     {
-        
+        xoffset = Random.Range(0f, 99999f);
+        yoffset = Random.Range(0f, 99999f);
     }
 
     private void Awake()
@@ -50,10 +53,12 @@ public class worldgen : MonoBehaviour
 
 
             ChunkGenerator chunk = gameobject.AddComponent<ChunkGenerator>();
+            chunk.xoffset = xoffset;
+            chunk.yoffset = yoffset;
 
             chunk.pos = pos;
 
-            chunk.generateworld(tree);
+            chunk.generateworld();
             
             chunk.addcomponents();
             world.Add(pos, chunk);

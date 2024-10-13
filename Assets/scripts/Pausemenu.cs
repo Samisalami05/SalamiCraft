@@ -10,7 +10,7 @@ public class Pausemenu : MonoBehaviour
     public GameObject pausemenu;
     void Start()
     {
-        
+        menuOpen = false;
     }
 
     // Update is called once per frame
@@ -22,7 +22,7 @@ public class Pausemenu : MonoBehaviour
             menuOpen = true;
             Debug.Log("wow");
         }
-        
+       
     }
     public void Resume()
     {
